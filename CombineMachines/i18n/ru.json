@@ -1,0 +1,10 @@
+{
+  "ToolTipQuantityLabel": "Количество:",
+  "ToolTipPowerLabel": "Сила:",
+  "ToolTipCaskAgingRateLabel": "Скорость старения:",
+  "ToolTipCaskDaysUntilIridiumLabel": "Дней до иридиума:",
+  "ToolTipMinutesRemainingLabel": "Осталось минут:",
+  "ToolTipProducedQuantityLabel": "Количество продукции:",
+  "ToolTipCrabPotProcessingIntervalLabel": "Интервал (в минутах):",
+  "ToolTipScarecrowRadiusLabel": "Радиус:"
+}

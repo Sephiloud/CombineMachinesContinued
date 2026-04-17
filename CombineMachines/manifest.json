@@ -1,0 +1,11 @@
+{
+  "Name": "Combine Machines Continued",
+  "Author": "Sephiloud",
+  "Version": "1.4.0",
+  "Description": "Use multiple copies of the same machine on each other to combine their processing capabilities.",
+  "UniqueID": "Sephiloud.CombineMachines",
+  "EntryDll": "CombineMachines.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [ "Nexus:44196" ],
+  "Dependencies": [ ]
+}
