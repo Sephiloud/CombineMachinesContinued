@@ -58,6 +58,7 @@ namespace CombineMachines
 
         public const string ModDataQuantityKey = "SlayerDharok.CombineMachines.CombinedQuantity";
         public const string ModDataDefaultAgingKey = "Sephiloud.CombineMachinesContinued.PreviousAgingRate";
+        public const string ModDataInputItemStack = "Sephiloud.CombineMachinesContinued.InputItemStack";
         public static ModEntry ModInstance { get; private set; }
         public static IMonitor Logger { get { return ModInstance?.Monitor; } }
         public static IBetterGameMenuApi BetterGameMenuApi { get; private set; }

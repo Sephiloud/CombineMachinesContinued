@@ -354,6 +354,21 @@ namespace CombineMachines.Patches
                                 double MaxMultiplier = ModEntry.UserConfig.ComputeProcessingPower(CombinedQty);
                                 bool MultiplyCoalInputs = ModEntry.UserConfig.FurnaceMultiplyCoalInputs;
 
+                                // TODO: May be incompatible with other mods calling OutputMachine directly with different base conditions than I assume here
+                                // Assume CalledByMod is like Automate -> calling with autoLoadFrom == null means it is something equivalent to an automatic call like DayCheck or CheckForActionOnMachine
+                                // -> CalledByCodeMod reaching this point has an input item, meaning I can mostly assume it's a machine working like the Crystalarium (one time input item, producing indefinitely)
+                                if (MaxMultiplier > 1.0 && CallerName == "CalledByCodeMod" && SObject.autoLoadFrom == null)
+                                {
+                                    bool hasInputItemStack = Machine.modData.TryGetValue(ModEntry.ModDataInputItemStack, out string InputItemStackString);
+                                    if (SObject.autoLoadFrom == null && hasInputItemStack && int.TryParse(InputItemStackString, out int InputItemStack))
+                                    {
+                                        ModEntry.Logger.Log($"{nameof(OutputMachinePatch)}.{nameof(Postfix)}: "
+                                            + $"Modifying {Machine.DisplayName} (Id: {Machine.QualifiedItemId}) based on input item stack: {InputItemStack}!", ModEntry.InfoLogLevel);
+                                        ActualProcessingPower = InputItemStack;
+                                        break;
+                                    }
+                                }
+
                                 //  Note: Some machines (such as Fish Smokers) don't require a specific input item, so the triggerrule's RequiredItemId would be null
                                 string MainIngredientId = triggerRule.RequiredItemId ?? inputItem.QualifiedItemId;
 
@@ -381,8 +396,13 @@ namespace CombineMachines.Patches
                                 //  Consume the extra inputs
                                 if (ActualProcessingPower > 1.0)
                                 {
-                                    //  Consume main input
-                                    Inventory.ReduceId(MainIngredientId, RNGHelpers.WeightedRound((ActualProcessingPower - 1.0) * triggerRule.RequiredCount)); // "(ActualProcessingPower - 1.0)" because 100% of inputs have already been consumed by vanilla game functions
+                                    //  Consume main input, save item input stack used as mod data on the machine
+                                    int itemInputStack = RNGHelpers.WeightedRound(ActualProcessingPower * triggerRule.RequiredCount);
+                                    Machine.modData[ModEntry.ModDataInputItemStack] = itemInputStack.ToString();
+                                    // -triggerRule.RequiredCount because 100% of inputs have already been consumed by vanilla game functions
+                                    int extraConsumedMainIngredientCount = itemInputStack - triggerRule.RequiredCount;
+                                    Inventory.ReduceId(MainIngredientId, extraConsumedMainIngredientCount); 
+                                    if (Machine.QualifiedItemId == CrystalariumQualifiedId) Machine.modData[ModEntry.ModDataInputItemStack] = itemInputStack.ToString();
 
                                     //  Consume secondary input(s)
                                     if (machine.AdditionalConsumedItems != null)
